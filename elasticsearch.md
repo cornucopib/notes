@@ -46,121 +46,41 @@ GET /my_index/_search
               "script": {
                 "script": {
                   "source": """
-                  def aValues = doc['A.a'];
-                  for (def item : aValues) {
-                    if (!params.a1.contains(item)) {
+                  def a1 = params.a1;
+                  if(a1 != null&&!a1.isEmpty()&&!a1.contains("All")){
+                    // 获取 A.a 字段的值
+                    def aValues = doc['A.a'];
+                    // 如果 aValues 为 null 或为空，直接返回 false
+                    if (aValues == null || aValues.isEmpty()) {
                       return false;
+                    }
+                    // 检查 aValues 中的所有值是否都在 a1 中
+                    for (def item : aValues) {
+                      if (!a1.contains(item)) {
+                        return false;
+                      }
+                    }
+                  }
+                  def b1 = params.b1;
+                  if(b1 != null&&!a1.isEmpty()&&!b1.contains("All")){
+                    // 获取 A.a 字段的值
+                    def bValues = doc['A.b'];
+                    // 如果 aValues 为 null 或为空，直接返回 false
+                    if (bValues == null || bValues.isEmpty()) {
+                      return false;
+                    }
+                    // 检查 aValues 中的所有值是否都在 a1 中
+                    for (def item : bValues) {
+                      if (!b1.contains(item)) {
+                        return false;
+                      }
                     }
                   }
                   return true;
                   """,
                   "params": {
-                    "a1": ["a", "b", "c", "d"]
-                  }
-                }
-              }
-            },
-            {
-              "script": {
-                "script": {
-                  "source": """
-                  def bValues = doc['A.b'];
-                  for (def item : bValues) {
-                    if (!params.a2.contains(item)) {
-                      return false;
-                    }
-                  }
-                  return true;
-                  """,
-                  "params": {
-                    "a2": ["b", "e","f","x"]
-                  }
-                }
-              }
-            },
-            {
-              "script": {
-                "script": {
-                  "source": """
-                  def cValues = doc['A.c'];
-                  for (def item : cValues) {
-                    if (!params.a3.contains(item)) {
-                      return false;
-                    }
-                  }
-                  return true;
-                  """,
-                  "params": {
-                    "a3": ["c", "g", "h"]
-                  }
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-  }
-}
-
-GET /my_index/_search
-{
-  "query": {
-    "nested": {
-      "path": "A",
-      "query": {
-        "bool": {
-          "must": [
-            {
-              "script": {
-                "script": {
-                  "source": """
-                  int count = 0;
-                  for (def item : params.a1) {
-                    if (doc['A.a'].contains(item)) {
-                      count++;
-                    }
-                  }
-                  return count == params.a1.size();
-                  """,
-                  "params": {
-                    "a1": ["a", "b", "c", "d"]
-                  }
-                }
-              }
-            },
-            {
-              "script": {
-                "script": {
-                  "source": """
-                  int count = 0;
-                  for (def item : params.a2) {
-                    if (doc['A.b'].contains(item)) {
-                      count++;
-                    }
-                  }
-                  return count == params.a2.size();
-                  """,
-                  "params": {
-                    "a2": ["b", "d", "e"]
-                  }
-                }
-              }
-            },
-            {
-              "script": {
-                "script": {
-                  "source": """
-                  int count = 0;
-                  for (def item : params.a3) {
-                    if (doc['A.c'].contains(item)) {
-                      count++;
-                    }
-                  }
-                  return count == params.a3.size();
-                  """,
-                  "params": {
-                    "a3": ["c", "g", "h"]
+                    "a1": ["All"],
+                    "b1": ["b", "e", "f"]
                   }
                 }
               }
